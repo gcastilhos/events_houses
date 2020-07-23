@@ -4,8 +4,12 @@
       <div class="row">
         <div class="left"></div>
         <h2>Blockchain1</h2>
-        <div v-for="row in rows" class="row">
-          <div v-for="column in numCols(row)" v-bind:class="{ cell_left: column % 2 == 1, cell_right: column % 2 == 0 }">
+        <div v-for="(row, indRow) in rows"
+             :key="'r_' + indRow"
+             class="row">
+          <div v-for="(column, indCol) in numCols(row)"
+               :key="'c_' + indCol"
+               v-bind:class="{ cell_left: column % 2 == 1, cell_right: column % 2 == 0 }">
             <form>
               <div>
                 <div class="block_no">Block <span v-html="lpad((getIndex(row, column) + 1))" /></div>
@@ -42,20 +46,19 @@
                   <td class="text" colspan="3">
                     <input class="hash" disabled="true" type="text" v-model="hash[getIndex(row, column)]" />
                   </td>
-                 </tr>
-               </table>
-               <br />
-               <table class="no_border">
-                 <tr>
-                   <td class="label narrow">SHA&nbsp;256</td>
-                   <td class="text" colspan="3"> 
-                     <input class="hash"  v-bind:class="{bg_red: active[getIndex(row, column)]}" disabled="true" type="text" v-model="original_hash[getIndex(row, column)]" />
-                   </td>
-                 </tr>
-               </table>
-             </form>
-           </div>
-         </div>
+                </tr>
+              </table>
+              <br />
+              <table class="no_border">
+                <tr>
+                  <td class="label narrow">SHA&nbsp;256</td>
+                  <td class="text" colspan="3"> 
+                    <input class="hash"  v-bind:class="{bg_red: active[getIndex(row, column)]}" disabled="true" type="text" v-model="original_hash[getIndex(row, column)]" />
+                  </td>
+                </tr>
+              </table>
+            </form>
+          </div>
         </div>
         <div class="right"></div>
       </div>
@@ -64,8 +67,10 @@
 </template>
 
 <script>
+import Vue from 'vue';
 import VueRouter from 'vue-router';
-// import sha256 from 'sha256';
+import sha256 from 'sha256';
+Vue.use(VueRouter);
 
 var mockEventData = "Date|Time|EventID|Appl.ID |ActivePWR |ReactivePwr|Voltage|Intensity |HASH\u003e\u003e\u003e 10Mar2015 0:00:00 1201210 9b75a5178a 2.58 0.136 241.97 10.6\u003e\u003e\u003e 10Mar2015 0:01:00 1201211 9b75a5178f 2.552 0.1 241.75 10.4\u003e\u003e\u003e 10Mar2015 0:02:00 1201212 9b75a51791 2.55 0.1 241.64 10.4\u003e\u003e\u003e 10Mar2015 0:03:00 1201213 9b75a5178d 2.55 0.1 241.71 10.4\u003e\u003e\u003e 10Mar2015 0:04:00 1201214 9b75a5178b 2.554 0.1 241.98 10.4\u003e\u003e\u003e 10Mar2015 0:05:00 1201215 9b75a5178f 2.55 0.1 241.83 10.4\u003e\u003e\u003e 10Mar2015 0:06:00 1201216 9b75a51790 2.534 0.09 241.07 10.4\u003e\u003e\u003e 10Mar2015 0:07:00 1201217 9b75a51791 2.484 0.21 241.29 10.2\u003e\u003e\u003e 10Mar2015 0:08:00 1201218 9b75a5178a 2.468 0.32 241.23 10.2\u003e\u003e\u003e 10Mar2015 0:09:00 1201219 9b75a51793 2.48 0.54 242.28 10.2";
 
@@ -75,18 +80,7 @@ var valid_hash = function(hash_code) {
    if (hash_code !== undefined) {
      return hash_code.startsWith("000");
    }
-     return false;
-};
-
-var encode = function(id) {
-  var nonce = -1;
-  var hash_code = undefined;
-  while (!valid_hash(hash_code)) {
-    nonce++;
-    var text_to_encode = app.previous_hash[id] + app.eventData[id] + nonce;
-//    hash_code = sha256(text_to_encode);
-  }
-  return {"nonce": nonce, "hash": hash_code};
+   return false;
 };
 
 var router = new VueRouter({
@@ -110,8 +104,18 @@ export default {
     }
   },
   methods: {
+    encode: function(id) {
+      var nonce = -1;
+      var hash_code = undefined;
+      while (!valid_hash(hash_code)) {
+        nonce++;
+        var text_to_encode = this.previous_hash[id] + this.eventData[id] + nonce;
+        hash_code = sha256(text_to_encode);
+      }
+      return {"nonce": nonce, "hash": hash_code};
+    },
     getHash: function(id) {
-      var data = encode(id);
+      var data = this.encode(id);
       this.$set(this.nonce, id, data.nonce);
       this.$set(this.hash, id, data.hash);
       if (this.original_hash[id] === '') {
@@ -151,13 +155,11 @@ export default {
       return ("000" + num).slice(-6);
     }
   },
-  created: function() {
-    this.setInitialHash();
-    this.getHash(0);
-  },
   mounted: function() {
     this.blocks = this.$route.query.blocks !== undefined ? Math.min(this.$route.query.blocks, MAX_BLOCKS) : 1;
     this.rows = Math.ceil(this.blocks / 2); 
+    this.setInitialHash();
+    this.getHash(0);
   }
 }
 </script>
