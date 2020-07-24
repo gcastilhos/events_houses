@@ -39,7 +39,16 @@ heroku config:set NODE_ENV=staging --app blockchainevents-staging
 heroku config:set NODE_ENV=production --app blockchainevents
 ```
 
-### The static.json File
+### MAX_BLOCKS
+
+It is possible to set the maximum number of blocks that can be displayed. Setting the environment variable
+```
+VUE_APP_MAX_BLOCKS=<number_of_blocks>
+```
+
+in any `.env` file will provide the value for the application.
+
+## The static.json File
 
 For static applications, a `static.json` file must be added, following the format
 ```
@@ -59,7 +68,7 @@ heroku buildpacks:add heroku/nodejs --app <heroku app>
 heroku buildpacks:add https://github.com/heroku/heroku-buildpack-static --app <heroku app>
 ```
 
-#### Heroku Apps
+### Heroku Apps
 
 * eventshouses-dev
 * eventshouses-staging
