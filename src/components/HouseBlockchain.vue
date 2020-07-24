@@ -99,7 +99,7 @@ table {
     border: solid 2px grey; 
     border-spacing: 5px;
     background-color: #e2f0d9;
-    width: 428px;
+    width: 432px;
 }
 
 table.no_border {
@@ -172,6 +172,10 @@ td.red {
     font-family: Cablibri, Arial, Sans-serif;
 }
 
+.bg_red {
+    background-color: red;
+}
+
 /**
  * Input elements
  */
@@ -189,7 +193,7 @@ input[type=text] {
 input[type=text].red {
     color: red;
     font-weight: normal;
-    width: 100%;
+    width: 99%;
 }
 
 input[type=text].bg_red {
