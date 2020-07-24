@@ -10,7 +10,7 @@
           <div v-for="(column, indCol) in numCols(row)"
                :key="'c_' + indCol"
                v-bind:class="{ cell_left: column % 2 == 1, cell_right: column % 2 == 0 }">
-            <house-blockchain v-on:get-hash="getNewHash($event, $eventData)"
+            <house-blockchain v-on:get-hash="getNewHash($event)"
                               :index="getIndex(row, column)"
                               :houseNo="getIndex(row, column)"
                               :active="active[getIndex(row, column)]"
